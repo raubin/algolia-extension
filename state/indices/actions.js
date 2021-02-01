@@ -96,7 +96,7 @@ const addCosmicObjectsToAlgolia = async (applicationId, adminApiKey, index) => {
   // Pagination
   if (data.total > limit) {
     for (let skip = limit; skip < data.total; skip = skip + limit) {
-      const loop_data = await bucket.getObjects({ type: index, skip: skip });
+      const loop_data = await bucket.getObjects({ type: index, skip: skip, limit: limit });
       const objects = loop_data.objects.map(convertCosmicObjToAlgoliaObj);
       const addObjectsRes = await algoliaIndex.addObjects(objects);
       const { taskID } = addObjectsRes;
