@@ -88,6 +88,9 @@ const addCosmicObjectsToAlgolia = async (applicationId, adminApiKey, index) => {
   if (index === 'careers') {
     limit = 30;
   }
+  if (index === 'stories') {
+    limit = 300;
+  }
   const data = await bucket.getObjects({ type: index, skip: 0, limit: limit });
   const objects = data.objects.map(convertCosmicObjToAlgoliaObj);
   const addObjectsRes = await algoliaIndex.addObjects(objects);
