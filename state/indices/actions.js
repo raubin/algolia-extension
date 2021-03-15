@@ -85,13 +85,23 @@ const addCosmicObjectsToAlgolia = async (applicationId, adminApiKey, index) => {
   const algoliaIndex = client.initIndex(index);
   const bucket = getBucket();
   let limit = 1000;
+  let depth = null;
   if (index === 'careers') {
     limit = 30;
+    depth = 1;
   }
   if (index === 'stories') {
     limit = 50;
+    depth = 1;
   }
-  const data = await bucket.getObjects({ type: index, skip: 0, limit: limit });
+  const data = await bucket.getObjects({
+    type: index,
+    skip: 0,
+    limit,
+    ...(depth && {
+      depth,
+    }),
+  });
   const objects = data.objects.map(convertCosmicObjToAlgoliaObj);
   const addObjectsRes = await algoliaIndex.addObjects(objects);
   const { taskID } = addObjectsRes;
@@ -99,7 +109,14 @@ const addCosmicObjectsToAlgolia = async (applicationId, adminApiKey, index) => {
   // Pagination
   if (data.total > limit) {
     for (let skip = limit; skip < data.total; skip = skip + limit) {
-      const loop_data = await bucket.getObjects({ type: index, skip: skip, limit: limit });
+      const loop_data = await bucket.getObjects({
+        type: index,
+        skip,
+        limit,
+        ...(depth && {
+          depth,
+        }),
+      });
       const objects = loop_data.objects.map(convertCosmicObjToAlgoliaObj);
       const addObjectsRes = await algoliaIndex.addObjects(objects);
       const { taskID } = addObjectsRes;
